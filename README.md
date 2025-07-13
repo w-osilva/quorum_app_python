@@ -31,35 +31,29 @@ cd quorum_app_python
 ### 2. Create Virtual Environment
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+# On Linux
+python -m venv .venv && source .venv/bin/activate
+
+# On Windows
+# python -m venv .venv && source .venv\Scripts\activate
 ```
 
 ### 3. Install Dependencies
 
 ```bash
-# For development (includes all dependencies and tools)
-pip install -e ".[dev]"
-
-# For production only
-pip install .
+make install
 ```
 
 ### 4. Set Up Database & Import Data
 
 ```bash
-make db-create
-make db-import
+make db-create && make db-import
 ```
-
-This will:
-- Create the database and all tables
-- Import CSV data from the `data/` directory
 
 ### 5. Run the App
 
 ```bash
-python run.py
+make server
 ```
 
 - Web: [http://localhost:8000/](http://localhost:8000/)
@@ -72,7 +66,8 @@ python run.py
 
 ```bash
 make help            # Show all available commands
-make dev-install     # Install development dependencies
+make install         # Install production and development dependencies
+make install-dev     # Install development dependencies
 make lint            # Run Ruff linter on Python code
 make lint-templates  # Run djlint on HTML templates
 make lint-fix        # Auto-fix code formatting and linting issues
@@ -85,6 +80,7 @@ make db-create       # Create database tables
 make db-drop         # Drop database tables
 make db-reset        # Drop and recreate all tables
 make db-import       # Import data from CSV files
+make server          # Run Flask webserver   
 ```
 
 ---
@@ -94,8 +90,7 @@ make db-import       # Import data from CSV files
 ### Database Issues
 If you need to reset the database:
 ```bash
-make db-reset          # Drop and recreate all tables
-make db-import         # Re-import data from CSV files
+make db-reset && make db-import
 ```
 
 Or use the database management script directly:
@@ -147,7 +142,7 @@ quorum-app-python/
 ├── Makefile                 # Development commands
 ├── pyproject.toml           # Project configuration & dependencies
 ├── pytest.ini               # Pytest configuration
-├── run.py                   # Application entry point
+├── server.py                # Application entry point
 └── README.md
 ```
 
