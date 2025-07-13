@@ -6,10 +6,11 @@ help: ## Show this help message
 	@echo 'Targets:'
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-install: ## Install production dependencies
+install: ## Install dependencies
 	pip install .
+	@$(MAKE) install-dev
 
-dev-install: ## Install development dependencies
+install-dev: ## Install development dependencies
 	pip install -e ".[dev]"
 
 db-create: ## Create database tables
@@ -72,3 +73,7 @@ ci: ## Run CI checks (format, lint, test)
 	@$(MAKE) check
 	@$(MAKE) test
 	@echo "All CI checks passed!"
+
+server: ## Run the server locally
+	@echo "Starting server in mode..."
+	python server.py
