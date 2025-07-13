@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Legislators - Quorum App{% endblock %}
+{% block header %}Legislators{% endblock %}
+{% block content %}
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-number">{{ legislators|length }}</div>
+      <div class="stat-label">Total Legislators</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">
+        {{ legislators|selectattr('sponsored_bills_count', 'gt', 0) |list|length }}
+      </div>
+      <div class="stat-label">With Sponsored Bills</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">
+        {{ legislators|selectattr('supported_bills_count', 'gt', 0) |list|length }}
+      </div>
+      <div class="stat-label">With Supported Bills</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">
+        {{ legislators|selectattr('opposed_bills_count', 'gt', 0) |list|length }}
+      </div>
+      <div class="stat-label">With Opposed Bills</div>
+    </div>
+  </div>
+  <div class="pure-g">
+    <div class="pure-u-1">
+      <div class="nav-links">
+        <a href="{{ url_for('legislators.list_legislators', format='json') }}"
+           class="pure-button">📄 JSON</a>
+        <a href="{{ url_for('legislators.list_legislators', format='csv') }}"
+           class="pure-button">📊 CSV</a>
+      </div>
+    </div>
+  </div>
+  <div class="pure-g">
+    <div class="pure-u-1">
+      <table class="pure-table pure-table-striped">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Sponsored Bills</th>
+            <th>Supported Bills</th>
+            <th>Opposed Bills</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for legislator in legislators %}
+            <tr>
+              <td>{{ legislator.id | na }}</td>
+              <td>{{ legislator.name | na }}</td>
+              <td>{{ legislator.sponsored_bills_count | number }}</td>
+              <td>{{ legislator.supported_bills_count | number }}</td>
+              <td>{{ legislator.opposed_bills_count | number }}</td>
+              <td>
+                <a href="{{ url_for('legislators.show_legislator', legislator_id=legislator.id) }}"
+                   class="pure-button pure-button-primary">View</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

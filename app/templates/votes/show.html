@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Vote: {{ vote.id }}{% endblock %}
+{% block content %}
+  <div class="header">
+    <h1>Vote Details</h1>
+    <div class="nav-links">
+      <a href="{{ url_for('votes.list_votes') }}">← Back to Votes</a>
+    </div>
+  </div>
+  <div class="detail-card">
+    <h2>Vote #{{ vote.id }}</h2>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <label>ID:</label>
+        <span>{{ vote.id }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Bill:</label>
+        <span>
+          {% if vote.bill %}
+            <a href="{{ url_for('bills.show_bill', bill_id=vote.bill.id) }}">
+              {{ vote.bill.title }}
+            </a>
+          {% else %}
+            N/A
+          {% endif %}
+        </span>
+      </div>
+      <div class="detail-item">
+        <label>Created:</label>
+        <span>{{ vote.created_at | datetime }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Updated:</label>
+        <span>{{ vote.updated_at | datetime }}</span>
+      </div>
+    </div>
+  </div>
+  {% if vote.vote_results %}
+    <div class="section">
+      <h3>Vote Results ({{ vote.vote_results|length }})</h3>
+      {% set vote_stats = vote.vote_results | groupby('vote_type') %}
+      <div class="stats">
+        {% for vote_type, results in vote_stats %}
+          <div class="stat-card">
+            <div class="stat-number">{{ results|list|length }}</div>
+            <div class="stat-label">{{ vote_type|vote_type_label }}</div>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="pure-g">
+        <table class="pure-table pure-table-striped">
+          <thead>
+            <tr>
+              <th>Legislator</th>
+              <th>Vote</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for result in vote.vote_results %}
+              <tr>
+                <td>
+                  {% if result.legislator %}
+                    <a href="{{ url_for('legislators.show_legislator', legislator_id=result.legislator.id) }}">
+                      {{ result.legislator.name }}
+                    </a>
+                  {% else %}
+                    N/A
+                  {% endif %}
+                </td>
+                <td>
+                  <span class="vote-{{ result.vote_type }}">{{ result.vote_type|title }}</span>
+                </td>
+                <td>{{ result.created_at | date }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}

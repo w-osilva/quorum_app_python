@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Votes - Quorum App{% endblock %}
+{% block header %}Votes{% endblock %}
+{% block content %}
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-number">{{ votes|length }}</div>
+      <div class="stat-label">Total Votes</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">
+        {{ votes|selectattr('vote_results_count', 'gt', 0) |list|length }}
+      </div>
+      <div class="stat-label">With Results</div>
+    </div>
+  </div>
+  <div class="pure-g">
+    <div class="pure-u-1">
+      <div class="nav-links">
+        <a href="{{ url_for('votes.list_votes', format='json') }}"
+           class="pure-button">📄 JSON</a>
+        <a href="{{ url_for('votes.list_votes', format='csv') }}"
+           class="pure-button">📊 CSV</a>
+      </div>
+    </div>
+  </div>
+  <div class="pure-g">
+    <div class="pure-u-1">
+      <table class="pure-table pure-table-striped">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Bill</th>
+            <th>Vote Results</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for vote in votes %}
+            <tr>
+              <td>{{ vote.id }}</td>
+              <td>{{ vote.bill_title or 'N/A' }}</td>
+              <td>{{ vote.vote_results_count }}</td>
+              <td>
+                <a href="{{ url_for('votes.show_vote', vote_id=vote.id) }}"
+                   class="pure-button pure-button-primary">View</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

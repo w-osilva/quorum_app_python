@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Vote Result: {{ vote_result.id }}{% endblock %}
+{% block content %}
+  <div class="header">
+    <h1>Vote Result Details</h1>
+    <div class="nav-links">
+      <a href="{{ url_for('vote_results.list_vote_results') }}">← Back to Vote Results</a>
+    </div>
+  </div>
+  <div class="detail-card">
+    <h2>Vote Result #{{ vote_result.id }}</h2>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <label>ID:</label>
+        <span>{{ vote_result.id }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Legislator:</label>
+        <span>
+          {% if vote_result.legislator %}
+            <a href="{{ url_for('legislators.show_legislator', legislator_id=vote_result.legislator.id) }}">
+              {{ vote_result.legislator.name }}
+            </a>
+          {% else %}
+            N/A
+          {% endif %}
+        </span>
+      </div>
+      <div class="detail-item">
+        <label>Vote:</label>
+        <span>
+          {% if vote_result.vote %}
+            <a href="{{ url_for('votes.show_vote', vote_id=vote_result.vote.id) }}">
+              Vote #{{ vote_result.vote.id }}
+            </a>
+          {% else %}
+            N/A
+          {% endif %}
+        </span>
+      </div>
+      <div class="detail-item">
+        <label>Bill:</label>
+        <span>
+          {% if vote_result.vote and vote_result.vote.bill %}
+            <a href="{{ url_for('bills.show_bill', bill_id=vote_result.vote.bill.id) }}">
+              {{ vote_result.vote.bill.title }}
+            </a>
+          {% else %}
+            N/A
+          {% endif %}
+        </span>
+      </div>
+      <div class="detail-item">
+        <label>Vote Type:</label>
+        <span class="vote-{{ vote_result.vote_type }}">{{ vote_result.vote_type|title }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Created:</label>
+        <span>{{ vote_result.created_at | datetime }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Updated:</label>
+        <span>{{ vote_result.updated_at | datetime }}</span>
+      </div>
+    </div>
+  </div>
+{% endblock %}

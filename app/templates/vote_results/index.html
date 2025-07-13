@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Vote Results - Quorum App{% endblock %}
+{% block header %}Vote Results{% endblock %}
+{% block content %}
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-number">{{ vote_results|length }}</div>
+      <div class="stat-label">Total Vote Results</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">
+        {{ vote_results|selectattr('vote_type', 'equalto', 1) |list|length }}
+      </div>
+      <div class="stat-label">Yea Votes</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">
+        {{ vote_results|selectattr('vote_type', 'equalto', 2) |list|length }}
+      </div>
+      <div class="stat-label">Nay Votes</div>
+    </div>
+  </div>
+  <div class="pure-g">
+    <div class="pure-u-1">
+      <div class="nav-links">
+        <a href="{{ url_for('vote_results.list_vote_results', format='json') }}"
+           class="pure-button">📄 JSON</a>
+        <a href="{{ url_for('vote_results.list_vote_results', format='csv') }}"
+           class="pure-button">📊 CSV</a>
+      </div>
+    </div>
+  </div>
+  <div class="pure-g">
+    <div class="pure-u-1">
+      <table class="pure-table pure-table-striped">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Legislator</th>
+            <th>Bill</th>
+            <th>Vote</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for vote_result in vote_results %}
+            <tr>
+              <td>{{ vote_result.id | na }}</td>
+              <td>{{ vote_result.legislator.name | na }}</td>
+              <td>{{ vote_result.vote.bill.title | truncate(50) | na }}</td>
+              <td>
+                <span class="pure-badge vote-{{ vote_result.vote_type | vote_type | lower }}
+                             {% if vote_result.vote_type == 1 %}
+                               pure-badge-success
+                             {% else %}
+                               pure-badge-error
+                             {% endif %}">
+                  {{ vote_result.vote_type | vote_type }}
+                </span>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

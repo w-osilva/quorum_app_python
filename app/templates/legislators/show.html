@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}{{ legislator.name }} - Quorum App{% endblock %}
+{% block header %}{{ legislator.name }}{% endblock %}
+{% block content %}
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-number">{{ legislator.sponsored_bills_count }}</div>
+      <div class="stat-label">Sponsored Bills</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ legislator.supported_bills_count }}</div>
+      <div class="stat-label">Supported Bills</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ legislator.opposed_bills_count }}</div>
+      <div class="stat-label">Opposed Bills</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ legislator.vote_results|length }}</div>
+      <div class="stat-label">Total Votes</div>
+    </div>
+  </div>
+  <div class="pure-g">
+    <div class="pure-u-1">
+      <h2>Legislator Details</h2>
+      <table class="pure-table">
+        <tr>
+          <td>
+            <strong>ID:</strong>
+          </td>
+          <td>{{ legislator.id }}</td>
+        </tr>
+        <tr>
+          <td>
+            <strong>Name:</strong>
+          </td>
+          <td>{{ legislator.name }}</td>
+        </tr>
+        <tr>
+          <td>
+            <strong>Created:</strong>
+          </td>
+          <td>{{ legislator.created_at | datetime }}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  {% if legislator.sponsored_bills %}
+    <div class="pure-g">
+      <div class="pure-u-1">
+        <h2>Sponsored Bills</h2>
+        <table class="pure-table pure-table-striped">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for bill in legislator.sponsored_bills %}
+              <tr>
+                <td>{{ bill.id }}</td>
+                <td>{{ bill.title }}</td>
+                <td>
+                  <a href="{{ url_for('bills.show_bill', bill_id=bill.id) }}"
+                     class="pure-button pure-button-primary">View</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% endif %}
+  {% if legislator.vote_results %}
+    <div class="pure-g">
+      <div class="pure-u-1">
+        <h2>Vote History</h2>
+        <table class="pure-table pure-table-striped">
+          <thead>
+            <tr>
+              <th>Bill</th>
+              <th>Vote</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for vote_result in legislator.vote_results %}
+              <tr>
+                <td>
+                  {% if vote_result.vote and vote_result.vote.bill %}
+                    {{ vote_result.vote.bill.title }}
+                  {% else %}
+                    Bill #{{ vote_result.vote.bill_id if vote_result.vote else 'N/A' }}
+                  {% endif %}
+                </td>
+                <td>
+                  <span class="pure-badge
+                               {% if vote_result.vote_type == 1 %}
+                                 pure-badge-success
+                               {% else %}
+                                 pure-badge-error
+                               {% endif %}">{{ vote_result.vote_type_str }}</span>
+                </td>
+                <td>{{ vote_result.created_at | datetime }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% endif %}
+  <div class="pure-g">
+    <div class="pure-u-1">
+      <a href="{{ url_for('legislators.list_legislators') }}"
+         class="pure-button">← Back to Legislators</a>
+    </div>
+  </div>
+{% endblock %}
