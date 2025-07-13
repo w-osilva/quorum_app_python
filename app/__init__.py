@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 from app.constants.vote_type import VoteType
@@ -78,6 +78,6 @@ def create_app():
     # Register root route
     @app.route("/")
     def index():
-        return app.send_static_file("index.html")
+        return redirect(url_for("legislators.list_legislators"))
 
     return app
