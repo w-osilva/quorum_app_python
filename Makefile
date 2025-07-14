@@ -53,7 +53,7 @@ lint-check: ## Run all checks (lint + format check)
 test: ## Run tests
 	pytest
 
-test-cov: ## Run tests with coverage
+coverage: ## Run tests with coverage
 	pytest --cov=app --cov-report=html --cov-report=term
 
 clean: ## Clean up build artifacts

@@ -4,11 +4,10 @@ A Flask + SQLAlchemy web app for managing and displaying legislative data from C
 
 ## Context
 
-This project is a python implementation of a previous [Ruby on Rails challenge](https://github.com/w-osilva/quorum-app) that I completed last year. 
+This project is a python implementation of a previous [Ruby on Rails challenge](https://github.com/w-osilva/quorum-app) that I completed last year. Below are the links to the documentation files that provide more context about the challenge and my implementation:
 
-The full challenge description and requirements can be found in the [docs/challenge.md](docs/challenge.md) file.
-
-I have also included the [docs/questions.md](docs/questions.md) file with details about my implementation strategy, decisions, and answers to the challenge questions.
+- [Challenge Overview](docs/challenge.md) - The full challenge description and requirements.
+- [Implementation Strategy](docs/questions.md) - Details about my implementation strategy, decisions, and answers to the challenge questions.
 
 ---
 
@@ -21,36 +20,42 @@ I have also included the [docs/questions.md](docs/questions.md) file with detail
 
 ## Quick Start
 
-### 1. Clone & Enter Project
+### 1. Clone the Repository
 
 ```bash
 git clone <repo-url>
 cd quorum_app_python
 ```
 
-### 2. Create Virtual Environment
+### 2. Run Setup Script
 
 ```bash
-# On Linux
-python -m venv .venv && source .venv/bin/activate
-
-# On Windows
-# python -m venv .venv && source .venv\Scripts\activate
+./setup.sh
 ```
 
-### 3. Install Dependencies
+The setup script will automatically:
+- Create a Python virtual environment (`.venv`)
+- Activate the virtual environment
+- Install all dependencies
+- Create the database tables
+- Import data from CSV files
+
+Or, if you prefer to run the commands manually, you can do:
 
 ```bash
-make install
+# Create and activate a Python virtual environment
+python -m venv .venv
+source .venv/bin/activate
+
+# Install required packages
+make install 
+
+# Create the database and import initial data
+make db-create 
+make db-import
 ```
 
-### 4. Set Up Database & Import Data
-
-```bash
-make db-create && make db-import
-```
-
-### 5. Run the App
+### 3. Run the App
 
 ```bash
 make server
@@ -58,24 +63,63 @@ make server
 
 - Web: [http://localhost:8000/](http://localhost:8000/)
 
+### Screenshots
+
+<details>
+<summary>📸 Legislators</summary>
+
+![Legislators](./docs/screenshots/legislators/index.png)
+</details>
+
+<details>
+<summary>📸 Legislator Details</summary>
+
+![Legislator Details](./docs/screenshots/legislators/show.png)
+</details>
+
+<details>
+<summary>📸 Bills</summary>
+
+![Bills](./docs/screenshots/bills/index.png)
+</details>
+
+<details>
+<summary>📸 Bill Details</summary>
+
+![Bill Details](./docs/screenshots/bills/show.png)
+</details>
+
+<details>
+<summary>📸 Votes</summary>
+
+![Votes](./docs/screenshots/votes/index.png)
+</details>
+
+<details>
+<summary>📸 Vote Details</summary>
+
+![Vote Details](./docs/screenshots/votes/show.png)
+</details>
+
+<details>
+<summary>📸 Vote Results</summary>
+
+![Vote Results](./docs/screenshots/vote_results/index.png)
+</details>
+
 ---
 
 ## Development
 
-### Available Make Commands
+This project uses a Makefile to simplify common development tasks, below are some handy commands:
 
 ```bash
 make help            # Show all available commands
 make install         # Install production and development dependencies
-make install-dev     # Install development dependencies
 make lint            # Run Ruff linter on Python code
-make lint-templates  # Run djlint on HTML templates
-make lint-fix        # Auto-fix code formatting and linting issues
-make lint-check      # Run all checks (lint + format check)
 make test            # Run tests
-make test-cov        # Run tests with coverage
+make coverage        # Run tests with coverage
 make clean           # Clean up build artifacts
-make ci              # Run full CI pipeline
 make db-create       # Create database tables
 make db-drop         # Drop database tables
 make db-reset        # Drop and recreate all tables
@@ -88,12 +132,17 @@ make server          # Run Flask webserver
 ## Troubleshooting
 
 ### Database Issues
-If you need to reset the database:
+If you need to reset the database to a clean state, you can use the following command:
 ```bash
-make db-reset && make db-import
+make db-reset
 ```
 
-Or use the database management script directly:
+The db-reset command will:
+- Drop all existing tables
+- Recreate the database schema
+- Import data from CSV files
+
+Or use the database management script directly for more granular control:
 ```bash
 python scripts/database.py reset --with-data   # Drop all tables and recreate them
 python scripts/database.py drop legislators    # Drop specific table
@@ -139,7 +188,6 @@ quorum-app-python/
 │       ├── routes/          # Route/API tests
 │       ├── schemas/         # Schema validation tests
 │       └── services/        # Service tests
-├── .gitignore               # Git ignore rules
 ├── Makefile                 # Development commands
 ├── pyproject.toml           # Project configuration & dependencies
 ├── pytest.ini               # Pytest configuration
@@ -153,7 +201,7 @@ quorum-app-python/
 - **Framework:** Flask 2.3+
 - **Database:** SQLAlchemy 2.0+ with SQLite
 - **Validation:** Pydantic 2.0+
-- **Testing:** pytest with coverage
+- **Testing:** pytest with coverage reports
 - **Code Quality:** Ruff (linting + formatting)
 - **Template Linting:** djlint
 - **Content Negotiation:** Custom multi-format responses (HTML/JSON/CSV)
@@ -184,4 +232,4 @@ All endpoints support multiple output formats:
 
 ## License
 
-Part of the Quorum code challenge. 
+Part of the Quorum code challenge.
