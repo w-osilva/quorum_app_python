@@ -17,7 +17,7 @@ db-create: ## Create database tables
 	python scripts/database.py create
 
 db-import: ## Import data from CSV files
-	python scripts/import_data.py
+	python scripts/importer.py
 
 db-drop: ## Drop all database tables
 	python scripts/database.py drop
@@ -76,4 +76,4 @@ ci: ## Run CI checks (format, lint, test)
 
 server: ## Run the server locally
 	@echo "Starting server in mode..."
-	python server.py
+	python scripts/server.py

@@ -25,14 +25,13 @@ import argparse
 import sys
 from pathlib import Path
 
-# Add project root to path
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
+# Add the project root directory to the Python path
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from app import create_app, db
 from app.models import Bill, Legislator, Vote, VoteResult
 
-# Table name to model mapping
+# TODO: Discover models dynamically
 TABLE_MODELS = {
     "legislators": Legislator,
     "bills": Bill,
@@ -97,17 +96,15 @@ def reset_tables(table_names=None, *, with_data=None):
     else:
         print("Resetting all database tables...")
 
-    # Drop tables
     drop_tables(table_names)
 
-    # Create tables
     create_tables(table_names)
 
     # Import data if requested
     if with_data and not table_names:  # Only import all data for full reset
         print("Importing data...")
         try:
-            from scripts.import_data import main as import_data_main
+            from scripts.importer import main as import_data_main
 
             import_data_main()
             print("✅ Data imported successfully!")

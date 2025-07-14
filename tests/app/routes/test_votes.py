@@ -6,7 +6,7 @@ class TestVotesAPI:
         """Test votes list HTML endpoint"""
         legislator = create_legislator(name="Test Legislator")
         bill = create_bill(title="Test Bill", sponsor=legislator)
-        vote = create_vote(bill=bill)
+        _vote = create_vote(bill=bill)
 
         response = client.get("/votes")
         assert response.status_code == 200

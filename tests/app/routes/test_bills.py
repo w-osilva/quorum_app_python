@@ -5,7 +5,7 @@ class TestBills:
     def test_list_bills_html(self, client, db_session):
         """Test bills list HTML endpoint"""
         legislator = create_legislator(name="Test Legislator")
-        bill = create_bill(title="Test Bill", sponsor=legislator)
+        _bill = create_bill(title="Test Bill", sponsor=legislator)
 
         response = client.get("/bills")
         assert response.status_code == 200
@@ -120,7 +120,7 @@ class TestBills:
     def test_list_bills_json_format_param(self, client, db_session):
         """Test bills list with ?format=json parameter"""
         legislator = create_legislator(name="Test Legislator")
-        bill = create_bill(title="Test Bill", sponsor=legislator)
+        _bill = create_bill(title="Test Bill", sponsor=legislator)
 
         response = client.get("/bills?format=json")
         assert response.status_code == 200
@@ -132,7 +132,7 @@ class TestBills:
     def test_list_bills_csv_format_param(self, client, db_session):
         """Test bills list with ?format=csv parameter"""
         legislator = create_legislator(name="Test Legislator")
-        bill = create_bill(title="Test Bill", sponsor=legislator)
+        _bill = create_bill(title="Test Bill", sponsor=legislator)
 
         response = client.get("/bills?format=csv")
         assert response.status_code == 200

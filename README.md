@@ -95,7 +95,7 @@ make db-reset && make db-import
 
 Or use the database management script directly:
 ```bash
-python scripts/database.py reset --with-data    # Reset and import data in one command
+python scripts/database.py reset --with-data   # Drop all tables and recreate them
 python scripts/database.py drop legislators    # Drop specific table
 python scripts/database.py create bills votes  # Create specific tables
 ```
@@ -129,7 +129,8 @@ quorum-app-python/
 ├── docs/                    # Documentation
 ├── scripts/                 # Utility scripts
 │   ├── database.py          # Database management CLI
-│   └── import_data.py       # CSV data importer
+│   ├── importer.py          # CSV data importer
+│   └── server.py            # Flask server runner
 ├── settings/                # Environment configurations
 ├── tests/                   # Test suite (mirrors app structure)
 │   ├── conftest.py          # Pytest configuration
@@ -142,7 +143,6 @@ quorum-app-python/
 ├── Makefile                 # Development commands
 ├── pyproject.toml           # Project configuration & dependencies
 ├── pytest.ini               # Pytest configuration
-├── server.py                # Application entry point
 └── README.md
 ```
 

@@ -6,7 +6,7 @@ from tests.factories import (
 class TestLegislatorsAPI:
     def test_list_legislators_html(self, client, db_session):
         """Test legislators list HTML endpoint"""
-        legislator = create_legislator(name="Test Legislator")
+        _legislator = create_legislator(name="Test Legislator")
 
         response = client.get("/legislators")
         assert response.status_code == 200

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Data import script for Quorum App
+Data importer script for Quorum App
 Imports CSV data into the database using batch processing
 """
 
@@ -11,8 +11,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 # Add the project root directory to the Python path
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from sqlalchemy.orm import Session
 

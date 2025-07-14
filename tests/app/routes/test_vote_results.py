@@ -12,7 +12,7 @@ class TestVoteResultsAPI:
         legislator = create_legislator(name="Test Legislator")
         bill = create_bill(title="Test Bill", sponsor=legislator)
         vote = create_vote(bill=bill)
-        vote_result = create_vote_result(legislator=legislator, vote=vote)
+        _vote_result = create_vote_result(legislator=legislator, vote=vote)
 
         response = client.get("/vote_results")
         assert response.status_code == 200
