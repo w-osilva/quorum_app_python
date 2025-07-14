@@ -181,7 +181,7 @@ def main():
             elif args.command == "drop":
                 drop_tables(args.table_names)
             elif args.command == "reset":
-                reset_tables(args.table_names, args.with_data)
+                reset_tables(args.table_names, with_data=args.with_data)
         except Exception as e:
             print(f"❌ Error: {e}")
             sys.exit(1)
