@@ -1,4 +1,3 @@
-
 from tests.factories import create_bill, create_legislator
 
 
@@ -88,7 +87,8 @@ class TestBills:
         bill = create_bill(title="Test Bill", sponsor=legislator)
 
         response = client.get(
-            f"/bills/{bill.id}", headers={"Accept": "application/json"},
+            f"/bills/{bill.id}",
+            headers={"Accept": "application/json"},
         )
         assert response.status_code == 200
         assert "application/json" in response.headers["Content-Type"]

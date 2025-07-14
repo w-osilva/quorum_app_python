@@ -1,4 +1,3 @@
-
 from tests.factories import create_bill, create_legislator, create_vote
 
 
