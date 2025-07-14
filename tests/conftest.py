@@ -2,12 +2,29 @@
 Pytest configuration for the Quorum app tests
 """
 
+import importlib
 import os
+import pkgutil
+
+import pytest
 
 # Set test environment BEFORE any other imports
 os.environ["ENVIRONMENT"] = "test"
 
-import pytest
+
+def setup_factory_sessions(session):
+    """Set up factory sessions for testing."""
+    # Import factories dynamically and set their sessions
+    for _, module_name, _ in pkgutil.iter_modules(["tests/factories"]):
+        if module_name != "__init__":
+            module = importlib.import_module(f"tests.factories.{module_name}")
+
+            # Find factory classes in the module and set their sessions
+            for attr_name in dir(module):
+                attr = getattr(module, attr_name)
+                if hasattr(attr, "_meta") and hasattr(attr._meta, "sqlalchemy_session"):
+                    # This is a factory class, set its session
+                    attr._meta.sqlalchemy_session = session
 
 
 @pytest.fixture
@@ -36,7 +53,9 @@ def app():
     with app.app_context():
         db.create_all()
         yield app
-        db.drop_all()
+        # Properly close all connections
+        db.session.remove()
+        db.engine.dispose()
 
 
 @pytest.fixture
@@ -52,108 +71,20 @@ def runner(app):
 
 
 @pytest.fixture
-def sync_session(app):
-    """Yield the Flask-SQLAlchemy db.session for use in tests, ensuring all tables are created."""
+def db_session(app):
+    """Yield the Flask-SQLAlchemy db.session for use in tests, ensuring proper cleanup."""
     from app import db
 
     with app.app_context():
-        yield db.session
+        # Create a new session for each test
+        session = db.session()
 
+        # Set up factory sessions
+        setup_factory_sessions(session)
 
-@pytest.fixture
-def sample_legislator(sync_session):
-    """Create a sample legislator for testing."""
-    from app.models import Legislator
-
-    legislator = Legislator(id=1, name="John Doe")
-    sync_session.add(legislator)
-    sync_session.commit()
-    return legislator
-
-
-@pytest.fixture
-def sample_bill(sync_session, sample_legislator):
-    """Create a sample bill for testing."""
-    from app.models import Bill
-
-    bill = Bill(id=1, title="Test Bill", sponsor_id=sample_legislator.id)
-    sync_session.add(bill)
-    sync_session.commit()
-    return bill
-
-
-@pytest.fixture
-def sample_vote(sync_session, sample_bill):
-    """Create a sample vote for testing."""
-    from app.models import Vote
-
-    vote = Vote(id=1, bill_id=sample_bill.id)
-    sync_session.add(vote)
-    sync_session.commit()
-    return vote
-
-
-@pytest.fixture
-def sample_data(sample_legislator, sample_bill, sample_vote):
-    """Fixture that provides all sample data together."""
-    return {"legislator": sample_legislator, "bill": sample_bill, "vote": sample_vote}
-
-
-@pytest.fixture
-def client(app):
-    """Create a test client for the app."""
-    return app.test_client()
-
-
-@pytest.fixture
-def runner(app):
-    """Create a test runner for the app's Click commands."""
-    return app.test_cli_runner()
-
-
-@pytest.fixture
-def sync_session(app):
-    """Yield the Flask-SQLAlchemy db.session for use in tests, ensuring all tables are created."""
-    from app import db
-
-    with app.app_context():
-        yield db.session
-
-
-@pytest.fixture
-def sample_legislator(sync_session):
-    """Create a sample legislator for testing."""
-    from app.models import Legislator
-
-    legislator = Legislator(id=1, name="John Doe")
-    sync_session.add(legislator)
-    sync_session.commit()
-    return legislator
-
-
-@pytest.fixture
-def sample_bill(sync_session, sample_legislator):
-    """Create a sample bill for testing."""
-    from app.models import Bill
-
-    bill = Bill(id=1, title="Test Bill", sponsor_id=sample_legislator.id)
-    sync_session.add(bill)
-    sync_session.commit()
-    return bill
-
-
-@pytest.fixture
-def sample_vote(sync_session, sample_bill):
-    """Create a sample vote for testing."""
-    from app.models import Vote
-
-    vote = Vote(id=1, bill_id=sample_bill.id)
-    sync_session.add(vote)
-    sync_session.commit()
-    return vote
-
-
-@pytest.fixture
-def sample_data(sample_legislator, sample_bill, sample_vote):
-    """Fixture that provides all sample data together."""
-    return {"legislator": sample_legislator, "bill": sample_bill, "vote": sample_vote}
+        try:
+            yield session
+        finally:
+            # Properly close the session and remove it
+            session.close()
+            db.session.remove()

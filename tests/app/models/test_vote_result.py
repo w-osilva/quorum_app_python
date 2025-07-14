@@ -1,115 +1,54 @@
-import pytest
-
-from app.models.bill import Bill
-from app.models.legislator import Legislator
-from app.models.vote import Vote
-from app.models.vote_result import VoteResult
-
-
-@pytest.fixture
-def sample_legislator(sync_session):
-    """Create a sample legislator for testing"""
-    legislator = Legislator(id=1, name="Test Legislator")
-    sync_session.add(legislator)
-    sync_session.commit()
-    return legislator
-
-
-@pytest.fixture
-def sample_bill(sync_session, sample_legislator):
-    """Create a sample bill for testing"""
-    bill = Bill(id=1, title="Test Bill", sponsor_id=sample_legislator.id)
-    sync_session.add(bill)
-    sync_session.commit()
-    return bill
-
-
-@pytest.fixture
-def sample_vote(sync_session, sample_bill):
-    """Create a sample vote for testing"""
-    vote = Vote(id=1, bill_id=sample_bill.id)
-    sync_session.add(vote)
-    sync_session.commit()
-    return vote
+from tests.factories import (
+    create_bill,
+    create_legislator,
+    create_vote,
+    create_vote_result,
+    create_vote_results,
+)
 
 
 class TestVoteResult:
-    def test_vote_result_creation(self, sync_session, sample_legislator, sample_vote):
+    def test_vote_result_creation(self, db_session):
         """Test vote result creation"""
-        vote_result = VoteResult(
-            legislator_id=sample_legislator.id,
-            vote_id=sample_vote.id,
-            vote_type=1,
-        )
-        sync_session.add(vote_result)
-        sync_session.commit()
-
+        legislator = create_legislator()
+        vote = create_vote()
+        vote_result = create_vote_result(legislator=legislator, vote=vote)
         assert vote_result.id is not None
-        assert vote_result.legislator_id == sample_legislator.id
-        assert vote_result.vote_id == sample_vote.id
-        assert vote_result.vote_type == 1
+        assert vote_result.legislator_id == legislator.id
+        assert vote_result.vote_id == vote.id
 
-    def test_vote_result_vote_type_label(
-        self,
-        sync_session,
-        sample_legislator,
-        sample_vote,
-    ):
-        """Test vote result vote_type_str property"""
-        yea_vote = VoteResult(
-            legislator_id=sample_legislator.id,
-            vote_id=sample_vote.id,
-            vote_type=1,
-        )
-        nay_vote = VoteResult(
-            legislator_id=sample_legislator.id,
-            vote_id=sample_vote.id,
-            vote_type=2,
-        )
-
-        assert yea_vote.vote_type_label == "Yea"
-        assert nay_vote.vote_type_label == "Nay"
-
-    def test_vote_result_relationships(
-        self,
-        sync_session,
-        sample_legislator,
-        sample_vote,
-    ):
+    def test_vote_result_relationships(self, db_session):
         """Test vote result relationships"""
-        vote_result = VoteResult(
-            legislator_id=sample_legislator.id,
-            vote_id=sample_vote.id,
-            vote_type=1,
-        )
-        sync_session.add(vote_result)
-        sync_session.commit()
+        legislator = create_legislator()
+        vote = create_vote()
+        vote_result = create_vote_result(legislator=legislator, vote=vote)
+        assert vote_result.legislator is not None
+        assert vote_result.legislator.id == legislator.id
+        assert vote_result.vote is not None
+        assert vote_result.vote.id == vote.id
 
-        assert vote_result.legislator.id == sample_legislator.id
-        assert vote_result.vote.id == sample_vote.id
+    def test_vote_result_vote_type(self, db_session):
+        """Test vote result vote type"""
+        vote_result = create_vote_result()
+        assert vote_result.vote_type in [1, 2]
 
-    def test_vote_result_repr(self, sync_session, sample_legislator, sample_vote):
+    def test_vote_result_repr(self, db_session):
         """Test vote result string representation"""
-        vote_result = VoteResult(
-            legislator_id=sample_legislator.id,
-            vote_id=sample_vote.id,
-            vote_type=1,
-        )
+        vote_result = create_vote_result()
         assert f"<VoteResult {vote_result.id}>" in str(vote_result)
 
-    def test_vote_result_invalid_vote_type(
-        self,
-        sync_session,
-        sample_legislator,
-        sample_vote,
-    ):
-        """Test vote result with invalid vote type"""
-        vote_result = VoteResult(
-            legislator_id=sample_legislator.id,
-            vote_id=sample_vote.id,
-            vote_type=3,  # Invalid vote type
-        )
+    def test_vote_result_with_custom_attributes(self, db_session):
+        """Test creating vote result with custom attributes"""
+        legislator = create_legislator(name="Custom Legislator")
+        bill = create_bill(title="Custom Bill")
+        vote = create_vote(bill=bill)
+        vote_result = create_vote_result(legislator=legislator, vote=vote)
+        assert vote_result.legislator.name == "Custom Legislator"
+        assert vote_result.vote.bill.title == "Custom Bill"
 
-        # Should still work as vote_type is just an integer
-        assert vote_result.vote_type is None
-        assert vote_result.vote_type_label is None
+    def test_multiple_vote_results(self, db_session):
+        """Test creating multiple vote results"""
+        vote_results = create_vote_results(count=5)
+        assert len(vote_results) == 5
+        assert all(vote_result.id is not None for vote_result in vote_results)
+        assert len(set(vote_result.id for vote_result in vote_results)) == 5

@@ -24,9 +24,9 @@ def sample_csv_file():
 
 
 class TestLegislatorImporter:
-    def test_import_legislators_success(self, sync_session, sample_csv_file):
+    def test_import_legislators_success(self, db_session, sample_csv_file):
         """Test successful import of legislators"""
-        importer = LegislatorImporter(sync_session)
+        importer = LegislatorImporter(db_session)
         result = importer.import_from_file(sample_csv_file)
 
         assert result.success is True
@@ -34,17 +34,17 @@ class TestLegislatorImporter:
         assert result.errors == []
 
         # Check that legislators were created
-        legislators = sync_session.query(Legislator).all()
+        legislators = db_session.query(Legislator).all()
         assert len(legislators) == 3
 
         # Check specific legislator
-        john_doe = sync_session.query(Legislator).filter_by(name="John Doe").first()
+        john_doe = db_session.query(Legislator).filter_by(name="John Doe").first()
         assert john_doe is not None
         assert john_doe.id == 1
 
-    def test_import_legislators_missing_file(self, sync_session):
+    def test_import_legislators_missing_file(self, db_session):
         """Test import with missing file"""
-        importer = LegislatorImporter(sync_session)
+        importer = LegislatorImporter(db_session)
         result = importer.import_from_file("nonexistent_file.csv")
 
         assert result.success is False
@@ -52,7 +52,7 @@ class TestLegislatorImporter:
         assert len(result.errors) > 0
         assert "not found" in result.errors[0].lower()
 
-    def test_import_legislators_invalid_csv(self, sync_session):
+    def test_import_legislators_invalid_csv(self, db_session):
         """Test import with invalid CSV format"""
         # Create invalid CSV file
         with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
@@ -60,7 +60,7 @@ class TestLegislatorImporter:
             temp_file = f.name
 
         try:
-            importer = LegislatorImporter(sync_session)
+            importer = LegislatorImporter(db_session)
             result = importer.import_from_file(temp_file)
 
             assert result.success is False
@@ -69,7 +69,7 @@ class TestLegislatorImporter:
         finally:
             os.unlink(temp_file)
 
-    def test_import_legislators_duplicate_ids(self, sync_session):
+    def test_import_legislators_duplicate_ids(self, db_session):
         """Test import with duplicate IDs"""
         # Create CSV with duplicate IDs
         with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
@@ -77,7 +77,7 @@ class TestLegislatorImporter:
             temp_file = f.name
 
         try:
-            importer = LegislatorImporter(sync_session)
+            importer = LegislatorImporter(db_session)
             result = importer.import_from_file(temp_file)
 
             # Should still succeed but with errors
@@ -87,14 +87,14 @@ class TestLegislatorImporter:
         finally:
             os.unlink(temp_file)
 
-    def test_import_legislators_empty_file(self, sync_session):
+    def test_import_legislators_empty_file(self, db_session):
         """Test import with empty file"""
         with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
             f.write("id,name\n")  # Only headers
             temp_file = f.name
 
         try:
-            importer = LegislatorImporter(sync_session)
+            importer = LegislatorImporter(db_session)
             result = importer.import_from_file(temp_file)
 
             assert result.success is True
@@ -103,14 +103,14 @@ class TestLegislatorImporter:
         finally:
             os.unlink(temp_file)
 
-    def test_import_legislators_missing_required_fields(self, sync_session):
+    def test_import_legislators_missing_required_fields(self, db_session):
         """Test import with missing required fields"""
         with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
             f.write("id\n1\n2")  # Missing name column
             temp_file = f.name
 
         try:
-            importer = LegislatorImporter(sync_session)
+            importer = LegislatorImporter(db_session)
             result = importer.import_from_file(temp_file)
 
             assert result.success is False
