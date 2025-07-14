@@ -23,36 +23,14 @@ This project is a python implementation of a previous [Ruby on Rails challenge](
 ### 1. Clone the Repository
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/w-osilva/quorum_app_python.git
 cd quorum_app_python
 ```
 
-### 2. Run Setup Script
+### 2. Setup Environment
 
 ```bash
-./setup.sh
-```
-
-The setup script will automatically:
-- Create a Python virtual environment (`.venv`)
-- Activate the virtual environment
-- Install all dependencies
-- Create the database tables
-- Import data from CSV files
-
-Or, if you prefer to run the commands manually, you can do:
-
-```bash
-# Create and activate a Python virtual environment
-python -m venv .venv
-source .venv/bin/activate
-
-# Install required packages
-make install 
-
-# Create the database and import initial data
-make db-create 
-make db-import
+./setup.sh  # Handles all setup automatically
 ```
 
 ### 3. Run the App
@@ -107,10 +85,24 @@ make server
 ![Vote Results](./docs/screenshots/vote_results/index.png)
 </details>
 
----
-
 ## Development
 
+### Manual Setup
+
+```bash
+# Create and activate a Python virtual environment
+python -m venv .venv
+source .venv/bin/activate
+
+# Install required packages
+make install 
+
+# Create the database and import initial data
+make db-create 
+make db-import
+```
+
+### Makefile Commands
 This project uses a Makefile to simplify common development tasks, below are some handy commands:
 
 ```bash
@@ -127,8 +119,6 @@ make db-import       # Import data from CSV files
 make server          # Run Flask webserver   
 ```
 
----
-
 ## Troubleshooting
 
 ### Database Issues
@@ -136,11 +126,6 @@ If you need to reset the database to a clean state, you can use the following co
 ```bash
 make db-reset
 ```
-
-The db-reset command will:
-- Drop all existing tables
-- Recreate the database schema
-- Import data from CSV files
 
 Or use the database management script directly for more granular control:
 ```bash
@@ -156,57 +141,27 @@ which python  # Should point to your .venv/bin/python
 pip list      # Should show the installed packages
 ```
 
----
 
 ## Project Structure
 
+Key components:
 ```
 quorum-app-python/
-├── app/                     # Main application
-│   ├── __init__.py          # Flask app factory
-│   ├── constants/           # Application constants
-│   ├── helpers/             # Helper utilities
-│   ├── lib/                 # Shared libraries
-│   ├── models/              # SQLAlchemy models
-│   ├── schemas/             # Pydantic schemas
-│   ├── routes/              # Flask blueprints
-│   ├── services/            # Business logic
-│   │   └── importers/       # CSV import services
-│   ├── templates/           # Jinja2 HTML templates
-│   └── static/              # CSS files
-├── data/                    # CSV data files + SQLite DB
-├── docs/                    # Documentation
-├── scripts/                 # Utility scripts
-│   ├── database.py          # Database management CLI
-│   ├── importer.py          # CSV data importer
-│   └── server.py            # Flask server runner
-├── settings/                # Environment configurations
-├── tests/                   # Test suite (mirrors app structure)
-│   ├── conftest.py          # Pytest configuration
-│   └── app/                 # Application tests
-│       ├── models/          # Model tests
-│       ├── routes/          # Route/API tests
-│       ├── schemas/         # Schema validation tests
-│       └── services/        # Service tests
-├── Makefile                 # Development commands
-├── pyproject.toml           # Project configuration & dependencies
-├── pytest.ini               # Pytest configuration
-└── README.md
+├── app/            # Flask application (models, routes, templates)
+├── data/           # CSV datasets + SQLite database
+├── scripts/        # Database/import CLI utilities
+└── tests/          # Full test coverage
 ```
 
----
+## Tech Stack
 
-## Technology Stack
-
-- **Framework:** Flask 2.3+
-- **Database:** SQLAlchemy 2.0+ with SQLite
-- **Validation:** Pydantic 2.0+
-- **Testing:** pytest with coverage reports
-- **Code Quality:** Ruff (linting + formatting)
-- **Template Linting:** djlint
-- **Content Negotiation:** Custom multi-format responses (HTML/JSON/CSV)
-
----
+- **Core**: Flask 2.3 + SQLAlchemy 2.0
+- **Validation**: Pydantic models
+- **Testing**: pytest (~85% coverage)
+- **Tooling**: 
+  - Ruff + djlint - Code quality
+  - Make - Task automation
+  - Custom responders - Multi-format API
 
 ## Features
 
@@ -227,8 +182,6 @@ All endpoints support multiple output formats:
 - Browse legislators, bills, votes, and vote results
 - Clean, responsive design with PureCSS
 - Easy navigation between related entities
-
----
 
 ## License
 
